@@ -24,7 +24,9 @@ export default React.memo(function MonthView(props) {
     const grantTotalBill = totalCowBill + totalBuffBill;
     return (
       <>
-        <table className="table">
+      <hr />
+      <h4 className="text-center">Monthly View</h4>
+        <table className="table table-striped">
           <thead>
             <tr>
               <th>Date</th>
@@ -58,7 +60,7 @@ export default React.memo(function MonthView(props) {
             <tr>
               <th>Grant Total</th>
               <th colSpan={2} className="text-center bg-success text-white">
-                <h3>{grantTotalBill}</h3>
+                <h3>&#8377; {grantTotalBill}</h3>
               </th>
             </tr>
           </tbody>
