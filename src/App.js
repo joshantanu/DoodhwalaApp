@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import DatePicker from 'sassy-datepicker';
 import MonthView from "./components/MonthView";
 import firebase from "./firebase/config";
+//import firebase, {SignInWithFirebase, LogoutWithFirebase} from "./firebase/config";
 import { monthNames } from "./AppConst";
 import Qty from "./components/Qty";
-
 
 function App() {
   const [ratibData, setratibData] = useState([]);
@@ -25,17 +25,14 @@ function App() {
     db.doc(`appDB/${selectedDMY.year}`)
       .get()
       .then((querySnapshot) => {
-        let members = querySnapshot.data();
-        //let dt = new Date();
-        //let month = monthNames[dt.getMonth()];
-        // console.log(members[month]["2"])
-        setratibData(members);
+        let dailyData = querySnapshot.data();
+        //console.log(dailyData)
+        setratibData(dailyData);
       });
   };
   useEffect(() => {
     fetchData();
-  }, []);
-
+  }, [selectedDMY.year]);
 
   const setData = () => {
     db.doc(`appDB/${selectedDMY.year}`)
@@ -66,20 +63,33 @@ function App() {
   }
   const onDateChange = thisDate => {
     const dmy = buildDateObj(thisDate)
+    //console.log(thisDate)
     //newDate = ${newDate.getFullYear()} ${monthNames[newDate.getMonth()]} ${newDate.getDate()}`);
     setDate(thisDate);
     setSelectedDMY(dmy)
 
   };
 
+  // const [isUserSignedIn, setisUserSignedIn] = useState();
+  // firebase.auth().onAuthStateChanged((user)=>{
+  //   if(user){
+  //     return setisUserSignedIn(true);
+  //   }
+  //   setisUserSignedIn(false);
+  // })
+
 
   return (
     <>
       <h3>Ashtavinayak Milk App</h3>
+      {/* <a href="#" onClick={SignInWithFirebase}>Login</a>
+      <a href="#" onClick={LogoutWithFirebase}>Logout</a>
+      // {console.log(isUserSignedIn)} |  */}
+     
       <label>Select Date</label>
       <div className="text-center"><DatePicker onChange={onDateChange} selected={date} maxDate={new Date()} /></div>
       <br />
-      {console.log(formData)}
+      {/* {console.log(formData)} */}
       <table className="table"><tbody>
         <tr>
           <th>Cow</th>

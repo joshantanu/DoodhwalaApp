@@ -1,11 +1,7 @@
 import React from "react";
 
 export default React.memo(function MonthView(props) {
-  // const [totalBuffBill,settotalBuffBill] = useState(0);
-  // const [totalCowBill,settotalCowBill] = useState(0);
-  // const [rateCow,setrateCow] = useState(0);
-  // const [rateBuff,setrateBuff] = useState(0);
-
+  //console.log('monthview',props)
   const { monthData, rateBuff, rateCow } = props;
 
   if (monthData !== undefined) {
