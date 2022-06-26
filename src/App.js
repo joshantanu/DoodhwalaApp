@@ -7,10 +7,10 @@ import { monthNames } from "./AppConst";
 import Qty from "./components/Qty";
 
 function App() {
-  const [ratibData, setratibData] = useState([]);
+  const [yearlyData, setyearlyData] = useState([]);
   const [formData, setformData] = useState({ cow: 1, buff: 1 });
   const [date, setDate] = useState(new Date());
- 
+
   const buildDateObj = thisDate => {
     const newDate = new Date(thisDate);
     let dmy = {};
@@ -20,14 +20,21 @@ function App() {
     return { ...dmy }
   }
   const [selectedDMY, setSelectedDMY] = useState(buildDateObj(date));
+  const [monthlyData, setmonthlyData] = useState({});
+  const [monthlyRate, setmonthlyRate] = useState({});
+ 
   const db = firebase.firestore();
   const fetchData = async () => {
     db.doc(`appDB/${selectedDMY.year}`)
       .get()
       .then((querySnapshot) => {
-        let dailyData = querySnapshot.data();
+        let yearlyData = querySnapshot.data();
         //console.log(dailyData)
-        setratibData(dailyData);
+        setyearlyData(yearlyData);
+        const monthlyData = yearlyData[selectedDMY.month];
+        setmonthlyRate(monthlyData.Rate)
+        delete monthlyData.Rate;
+        setmonthlyData(monthlyData);
       });
   };
   useEffect(() => {
@@ -35,6 +42,10 @@ function App() {
   }, [selectedDMY.year]);
 
   const setData = () => {
+    //if(!formData.cow_rate){
+      formData.cow_rate = formData.cow_rate || monthlyRate.cow;
+      formData.buff_rate = formData.buff_rate || monthlyRate.buff;
+    //}
     db.doc(`appDB/${selectedDMY.year}`)
       .set(
         {
@@ -43,7 +54,11 @@ function App() {
               cow: formData.cow,
               buff: formData.buff,
             },
-          },
+            Rate:{
+              cow:formData.cow_rate,
+              buff:formData.buff_rate
+            }
+          }
         },
         { merge: true }
       )
@@ -57,7 +72,7 @@ function App() {
     let thisformData = {}
 
     thisformData.[obj.target.name] = obj.target.value
-    // console.log(formData);
+     console.log(formData);
 
     setformData({ ...formData, ...thisformData });
   }
@@ -85,11 +100,10 @@ function App() {
       {/* <a href="#" onClick={SignInWithFirebase}>Login</a>
       <a href="#" onClick={LogoutWithFirebase}>Logout</a>
       // {console.log(isUserSignedIn)} |  */}
-     
-      <label>Select Date</label>
+  
       <div className="text-center"><DatePicker onChange={onDateChange} selected={date} maxDate={new Date()} /></div>
       <br />
-      {/* {console.log(formData)} */}
+      {/* {console.log(monthlyData)} */}
       <table className="table"><tbody>
         <tr>
           <th>Cow</th>
@@ -97,10 +111,10 @@ function App() {
         </tr>
         <tr>
           <td>
-           <Qty milkType="cow" controlClick={getFormData} />
+           <Qty milkType="cow" controlClick={getFormData} rate={monthlyRate} />
           </td>
           <td>
-          <Qty milkType="buff" controlClick={getFormData} />
+          <Qty milkType="buff" controlClick={getFormData} rate={monthlyRate} />
           </td>
         </tr></tbody>
       </table>
@@ -108,7 +122,7 @@ function App() {
         <button onClick={setData} className="btn btn-primary">SUBMIT</button>
       </div>
       <div><br /></div>
-      <MonthView monthData={ratibData[selectedDMY.month]} rateCow={50} rateBuff={60} />
+      <MonthView monthData={monthlyData} rateCow={monthlyRate.cow} rateBuff={monthlyRate.buff} />
     </>
   );
 }
