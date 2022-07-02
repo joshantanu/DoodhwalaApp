@@ -2,7 +2,7 @@ import React from "react";
 
 export default React.memo(function MonthView(props) {
   //console.log('monthview',props)
-  const { monthData, rateBuff, rateCow } = props;
+  const { monthData, rateBuff, rateCow, month } = props;
 
   if (monthData !== undefined) {
     let days = Object.keys(monthData);
@@ -21,7 +21,7 @@ export default React.memo(function MonthView(props) {
     return (
       <>
       <hr />
-      <h4 className="text-center">Monthly View</h4>
+      <h4 className="text-center">Monthly View - { month}</h4>
         <table className="table table-striped">
           <thead>
             <tr>

@@ -9,8 +9,8 @@ const db = firebase.firestore();
 
 function App() {
   const [formData, setformData] = useState({ cow: 1, buff: 1 });
-  const [date, setDate] = useState(new Date());
-
+  //const [date, setDate] = useState(new Date());
+  let date = new Date();
   const buildDateObj = (thisDate) => {
     const newDate = new Date(thisDate);
     let dmy = {};
@@ -19,23 +19,36 @@ function App() {
     dmy.year = newDate.getFullYear();
     return { ...dmy };
   };
+  //let selectedDMY = buildDateObj(date);
   const [selectedDMY, setSelectedDMY] = useState(buildDateObj(date));
   const [monthlyData, setmonthlyData] = useState({});
-  const [monthlyRate, setmonthlyRate] = useState({});
+  const [monthlyRate, setmonthlyRate] = useState({ cow: 52, buff: 64 });
+  const [yearlyData, setyearlyData] = useState({});
+
+  const filterMonthlyData = () => {
+    const monthlyData = yearlyData[selectedDMY.month];
+    if (monthlyData) {
+      monthlyData.Rate = monthlyData.Rate || monthlyRate;
+      setmonthlyRate(monthlyData.Rate);
+      delete monthlyData.Rate;
+      setmonthlyData(monthlyData);
+    } else {
+      setmonthlyData({});
+    }
+  };
 
   const fetchData = async () => {
     db.doc(`appDB/${selectedDMY.year}`)
       .get()
       .then((querySnapshot) => {
-        let yearlyData = querySnapshot.data();
+        setyearlyData(querySnapshot.data());
         //console.log(dailyData)
-        const monthlyData = yearlyData[selectedDMY.month];
-        monthlyData.Rate = monthlyData.Rate || { cow: 50, buff: 60 };
-        setmonthlyRate(monthlyData.Rate);
-        delete monthlyData.Rate;
-        setmonthlyData(monthlyData);
       });
   };
+  useEffect(() => {
+    filterMonthlyData();
+  }, [yearlyData, selectedDMY.month]);
+
   useEffect(() => {
     fetchData();
   }, [selectedDMY.year]);
@@ -74,11 +87,14 @@ function App() {
   };
 
   const onDateChange = (thisDate) => {
-    const dmy = buildDateObj(thisDate);
-    //console.log(thisDate)
+    //const dmy = buildDateObj(thisDate);
+    // console.log(dmy)
     //newDate = ${newDate.getFullYear()} ${monthNames[newDate.getMonth()]} ${newDate.getDate()}`);
-    setDate(thisDate);
-    setSelectedDMY(dmy);
+    date = thisDate;
+    setSelectedDMY(buildDateObj(thisDate));
+    // selectedDMY = buildDateObj(thisDate);
+    console.log(selectedDMY.month);
+    // filterMonthlyData();
   };
 
   // const [isUserSignedIn, setisUserSignedIn] = useState();
@@ -91,7 +107,7 @@ function App() {
 
   return (
     <>
-      <h3>Ashtavinayak Milk App</h3>
+      <h3 className="p-3 mb-2 bg-info text-white">Ashtavinayak Milk App</h3>
       {/* <a href="#" onClick={SignInWithFirebase}>Login</a>
       <a href="#" onClick={LogoutWithFirebase}>Logout</a>
       // {console.log(isUserSignedIn)} |  */}
@@ -104,7 +120,7 @@ function App() {
         />
       </div>
       <br />
-      {/* {console.log(monthlyData)} */}
+      {/* {console.log(yearlyData)} */}
       <table className="table">
         <tbody>
           <tr>
@@ -139,6 +155,7 @@ function App() {
       </div>
       <MonthView
         monthData={monthlyData}
+        month={selectedDMY.month}
         rateCow={monthlyRate.cow}
         rateBuff={monthlyRate.buff}
       />
