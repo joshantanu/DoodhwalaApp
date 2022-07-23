@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "sassy-datepicker";
 import MonthView from "./components/MonthView";
-import firebase from "./firebase/config";
-//import firebase, {SignInWithFirebase, LogoutWithFirebase} from "./firebase/config";
+//import firebase from "./firebase/config";
+import firebase, {SignInWithFirebase, LogoutWithFirebase} from "./firebase/config";
 import { monthNames } from "./AppConst";
 import Qty from "./components/Qty";
 const db = firebase.firestore();
@@ -42,7 +42,6 @@ function App() {
       .get()
       .then((querySnapshot) => {
         setyearlyData(querySnapshot.data());
-        //console.log(dailyData)
       });
   };
   useEffect(() => {
@@ -52,6 +51,27 @@ function App() {
   useEffect(() => {
     fetchData();
   }, [selectedDMY.year]);
+  
+  // const manualSetData = () => {
+  //   db.doc(`${uid}/${selectedDMY.year}`)
+  //     .set( bulkdata,
+  //       { merge: true }
+  //     )
+  //     .then(() => {
+  //       alert("Data Successfully Submitted");
+        
+  //     });
+  // };
+
+  //  const [uid, setuid] = useState(null);
+  // firebase.auth().onAuthStateChanged((user)=>{
+  //   if(user){
+  //     console.log(user.uid)
+  //     return setuid(user.uid);
+  //   }
+  //   setuid(null);
+  //   console.log(user);
+  // })
 
   const setData = () => {
     formData.cow_rate = formData.cow_rate || monthlyRate.cow;
@@ -87,30 +107,18 @@ function App() {
   };
 
   const onDateChange = (thisDate) => {
-    //const dmy = buildDateObj(thisDate);
-    // console.log(dmy)
-    //newDate = ${newDate.getFullYear()} ${monthNames[newDate.getMonth()]} ${newDate.getDate()}`);
     date = thisDate;
     setSelectedDMY(buildDateObj(thisDate));
-    // selectedDMY = buildDateObj(thisDate);
-    console.log(selectedDMY.month);
-    // filterMonthlyData();
+    // console.log(selectedDMY.month);
   };
 
-  // const [isUserSignedIn, setisUserSignedIn] = useState();
-  // firebase.auth().onAuthStateChanged((user)=>{
-  //   if(user){
-  //     return setisUserSignedIn(true);
-  //   }
-  //   setisUserSignedIn(false);
-  // })
+ 
 
   return (
     <>
       <h3 className="p-3 mb-2 bg-info text-white">Ashtavinayak Milk App</h3>
-      {/* <a href="#" onClick={SignInWithFirebase}>Login</a>
-      <a href="#" onClick={LogoutWithFirebase}>Logout</a>
-      // {console.log(isUserSignedIn)} |  */}
+      <a href="#" onClick={SignInWithFirebase}>Login</a> | <a href="#" onClick={LogoutWithFirebase}>Logout</a>
+       {/* { console.log(JSON.stringify(bulkdata))}  */}
 
       <div className="text-center">
         <DatePicker
